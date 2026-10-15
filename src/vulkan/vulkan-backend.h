@@ -29,6 +29,7 @@
 #include "../common/versioning.h"
 #include <mutex>
 #include <list>
+#include <stdexcept>
 
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include <vulkan/vulkan.hpp>
@@ -42,7 +43,10 @@
 #endif
 
 #define CHECK_VK_RETURN(res) if ((res) != vk::Result::eSuccess) { return res; }
-#define CHECK_VK_FAIL(res) if ((res) != vk::Result::eSuccess) { return nullptr; }
+#define CHECK_VK_FAIL(res) \
+    if ((res) != vk::Result::eSuccess) { \
+        throw std::runtime_error(std::string("Vulkan error: ") + vk::to_string(res)); \
+    }
 #if _DEBUG
 #define ASSERT_VK_OK(res) assert((res) == vk::Result::eSuccess)
 #else // _DEBUG
