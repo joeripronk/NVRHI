@@ -43,7 +43,16 @@ namespace nvrhi::vulkan
 #endif
         const PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr =   // NOLINT(misc-misplaced-const)
             dl.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
-        VULKAN_HPP_DEFAULT_DISPATCHER.init(desc.instance, vkGetInstanceProcAddr, desc.device);
+        // Always pass all four arguments. Vulkan-Hpp used to spell this as
+        // init(instance, getInstanceProcAddr, device = {}, getDeviceProcAddr = nullptr),
+        // so three arguments were enough; it now splits it into a two-argument
+        // overload and a four-argument one with no defaults, which makes the
+        // three-argument call ambiguous against the new two-argument form and a
+        // hard error against the old three-argument one. The four-argument call
+        // is valid under both spellings, so it needs no version guard.
+        const PFN_vkGetDeviceProcAddr vkGetDeviceProcAddr =       // NOLINT(misc-misplaced-const)
+            dl.getProcAddress<PFN_vkGetDeviceProcAddr>("vkGetDeviceProcAddr");
+        VULKAN_HPP_DEFAULT_DISPATCHER.init(desc.instance, vkGetInstanceProcAddr, desc.device, vkGetDeviceProcAddr);
 #endif
 
         Device* device = new Device(desc);
