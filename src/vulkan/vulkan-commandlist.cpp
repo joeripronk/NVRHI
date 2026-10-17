@@ -66,7 +66,11 @@ namespace nvrhi::vulkan
             .setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
 
         (void)m_CurrentCmdBuf->cmdBuf.begin(&beginInfo);
-        m_CurrentCmdBuf->referencedResources.push_back(this); // prevent deletion of e.g. UploadManager
+        // NOTE: we no longer add `this` (the CommandList) to referencedResources.
+        // The CommandList itself is managed by the caller (or by the frame's
+        // s_CommandList handle).  Only GPU resources that are referenced by
+        // commands need to survive; the CommandList manages its own
+        // UploadManager/ScratchManager via its member variables.
 
         clearState();
     }
